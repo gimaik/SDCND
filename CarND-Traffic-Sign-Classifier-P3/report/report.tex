@@ -1,0 +1,203 @@
+\documentclass[12pt,twoside]{article}
+
+\newcommand{\reporttitle}{Project 3: Traffic Signs Classifier}
+\newcommand{\reportauthor}{Thomas Teh}
+\newcommand{\reporttype}{Project Report}
+\newcommand{\cid}{0124 3008}
+
+% include files that load packages and define macros
+\input{includes} % various packages needed for maths etc.
+\input{notation} % short-hand notation and macros
+\DontPrintSemicolon
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+% front page
+\input{titlepage}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Main document
+\section{Introduction}
+This project is part of the Self-Driving Car Nanodegree by Udacity and its objective is to train a traffic signs classifier. The data set used to train the model is the  German Traffic Sign Dataset and the summary of the data is given below:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Type}	& \textbf{Amount}		& \textbf{Image Size}			& \textbf{Color}\\\hline
+Training			& 34799					&			$32\times32$			& RGB\\
+Validation			& 4410						&			$32\times32$			& RGB\\
+Test					& 12630 					&			$32\times32$			& RGB\\\hline
+\end{tabular}
+\end{center}
+
+The dataset contains 43 different classes and samples of the training images are shown in Figure \ref{fig:sample}. Also, we visualize the distribution of the different classes and we can observe that there is a significant class imbalance as in Figure \ref{fig:image distribution}.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 1.0\hsize]{./figures/Training_data.png} 
+		\caption{Sample training images.} % caption of the figure
+		\label{fig:sample} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 1.0\hsize]{./figures/Distribution.png} 
+		\caption{\emph{Top: }Training Set \emph{Middle: }Validation \emph{Bottom: }Test} % caption of the figure
+		\label{fig:image distribution} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+\newpage
+
+\section{Image Preprocessing}
+Preprocessing is done in the following steps:
+\begin{enumerate}
+	\item \textbf{Data Augmentation:} We augment the data by random performing the below transformations on the original training data set:
+		\begin{itemize}
+			\item Rotation: 25 degrees
+			\item Width shift: 0.20
+			\item Height shift: 0.20
+			\item Zoom range: (0.80, 1.20)
+		\end{itemize}
+	With the augmentation, the amount of the training data available is tripled to 104,397.
+	\item \textbf{Convert to Grayscale:} Since the colors of the signs do not make a big difference in terms of distinguishing the them, we convert the RGB images into grayscale. The advantage of this is it reduces computation, hence allow us to use a much deeper model without having to do distributed training on the data set.
+	\item \textbf{Histogram Normalization:} I applied the Contrast Limite Adaptive Histogram Equalization (CLAHE) to make the edges of the signs more obvious.
+\end{enumerate}
+
+A sample of an image after preprocessing is shown in Figure \ref{fig:preprocessing}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 0.4\hsize]{./figures/Preprocessing.png} 
+		\caption{Image after preprocessing} % caption of the figure
+		\label{fig:preprocessing} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+\newpage
+
+\section{Architecture and Hyperparameters}
+The architecture that I used is shown below:
+
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\textbf{Input} \\\hline
+\textbf{Convolution Layer} \\
+Kernel size: $5\times 5$, N Kernels: 256 \\\hline
+ReLU Activation Layer \\\hline
+Max Pooling Layer \\
+Kernel size: $2\times 2$\\\hline
+\textbf{Convolution Layer} \\
+Kernel size: $5\times 5$, N Kernels: 512 \\\hline
+ReLU Activation Layer \\\hline
+Max Pooling Layer \\\hline
+Kernel size: $2\times 2$\\\hline
+\textbf{Convolution Layer} \\
+Kernel size: $5\times 5$, N Kernels: 2048 \\\hline
+ReLU Activation Layer \\\hline
+Max Pooling Layer \\
+Kernel size: $2\times 2$\\\hline
+\textbf{Dense Layer:} 1024 units \\\hline
+ReLU Activation Layer \\\hline
+Drop Out Layer: dropout prob = 0.60 \\\hline
+\textbf{Dense Layer:} 512 units \\\hline
+ReLU Activation Layer \\\hline
+Drop Out Layer: dropout prob = 0.60 \\\hline
+\textbf{Dense Layer:} 43 units \\\hline
+\end{tabular}
+\end{center}
+
+The model is trained with ADAM optimization algorithm with the following hyperparameters:
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Hyperparameters		& 		Values\\\hline
+Epoch						&		20\\
+Batch Size				&		128\\
+Learning Rate			&		0.0010\\\hline
+\end{tabular}
+\end{center}
+
+Other comments:
+\begin{itemize}
+	\item Batch normalization did not help in the training process significantly and it results in a much slower training process. Hence I did not implement batch normalization in the final model.
+	\item ELU activation works but they did not perform as well as ReLUs. Therefore, I decided to stick to ReLU activation unit.
+	\item Drop out layers are used to prevent overfitting since we have a large number of neurons in the dense layers.
+\end{itemize}
+
+\newpage
+
+\section{Performance}
+The performance of the model after 20 epochs of training is shown in the table below:
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Data Type 		&		Accuracy \\\hline
+Training			&		99.96\%\\
+Validation			&		98.91\%\\
+Test					&		98.20\%\\\hline
+\end{tabular}
+\end{center}
+
+In addition to the test data, I sourced 6 images from the web and predictions from the model. The model achieves a 83.33\% accuracy. The model misclassified 1 image out of 6 images, and the reason is likely that this image contains a traffic sign that is vandalized (see Figure \ref{fig:vandalized_sign}).
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 1.0\hsize]{./figures/Web1.png} 
+		\caption{Image that was classified correctly.} % caption of the figure
+		\label{fig:correct_classification} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 1.0\hsize]{./figures/Web2.png} 
+		\caption{Image that was classified correctly.} % caption of the figure
+		\label{fig:correct_classification} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 1.0\hsize]{./figures/Web3.png} 
+		\caption{Image that was classified correctly.} % caption of the figure
+		\label{fig:correct_classification} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width = 1.0\hsize]{./figures/Web4.png} 
+		\caption{Image that was misclassified.} % caption of the figure
+		\label{fig:vandalized_sign} % a label. When we refer to this label from the text, the figure %number is included automatically
+	\end{center}
+\end{figure}
+
+\newpage
+
+\section{Ideas for Improvements}
+The following are some ideas for improving the project:
+\begin{itemize}
+	\item Can potentially do transfer learning. Instead of training a model from scratch, we can used a pretrained model such as ResNet or VGGNet. We can freeze the layers at the start of the model and only train the classifier. Given these models are trained on a larger data set, I would expect that the models developed using transfer learning to perform well.
+	\item Adjust the training process to account for the class imbalance. This will improve the performance of the model.
+	\item Expand the training data set by collecting the more data set. Most traffic signs in the German Traffic Signs data are similar or the same as those in other countries. We can potentially augment the data with real images of traffic signs from other countries.
+\end{itemize}
+
+
+
+%\bibliography{reference}
+%\bibliographystyle{apalike}
+
+
+\end{document}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
