@@ -5,6 +5,13 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
 class Calibration:
+	"""
+	Camera calibration based on chessboard calibration images
+	Args:
+	nx, ny: size of the chessboard images
+	image_paths: directory of the calibration images
+	"""
+	
 	def __init__(self, nx, ny, image_paths):
 		self.nx = nx
 		self.ny = ny
@@ -16,6 +23,12 @@ class Calibration:
 		self.__calibrator()
 
 	def __calibrator(self):		
+		"""
+		Reads the calibration images and prepares the calibrator using openCV's findChessboardCorners. 
+		Method updates self.mtx, self.dist, self.rvecs and self.tvecs.
+		Args: None
+		Returns: None
+		"""
 		objp = np.zeros((self.nx * self.ny,3), dtype=np.float32)
 		objp[:,:2] = np.mgrid[0 : self.nx, 0 : self.ny].T.reshape(-1,2)
 		
@@ -38,10 +51,20 @@ class Calibration:
 
 
 	def undistort(self, img):
+		"""
+		Undistort an image using the calibrator
+		Args: image to be undistorted
+		Returns: undistorted image 
+		"""        
 		undistort_img = cv2.undistort(img, self.mtx, self.dist, None, self.mtx)
 		return undistort_img
     
 	def plot_images(self, fname):
+		"""
+		Plotting function for calibrated images
+		Args: path to image
+		Returns: plots of original and undistorted images.
+		"""       
 		img = mpimg.imread(fname)
 		undistort_img = self.undistort(img)
 		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))

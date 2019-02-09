@@ -1,0 +1,10 @@
+\BOOKMARK [1][]{section.1}{1 Introduction}{}% 1
+\BOOKMARK [1][]{section.8}{2 Pipeline}{}% 2
+\BOOKMARK [2][]{subsection.9}{2.1 Calibration and Distortion Correction}{section.8}% 3
+\BOOKMARK [2][]{subsection.12}{2.2 Perspective Transform}{section.8}% 4
+\BOOKMARK [2][]{subsection.14}{2.3 Preprocessing and Constructing Binary Images}{section.8}% 5
+\BOOKMARK [2][]{subsection.16}{2.4 Lane Detection}{section.8}% 6
+\BOOKMARK [2][]{subsection.18}{2.5 Curvature Estimation}{section.8}% 7
+\BOOKMARK [2][]{subsection.19}{2.6 Visualization}{section.8}% 8
+\BOOKMARK [1][]{section.20}{3 Major Pitfalls and Potential Improvements}{}% 9
+\BOOKMARK [2][]{subsection.23}{3.1 Can we shoot two birds with one stone?}{section.20}% 10
