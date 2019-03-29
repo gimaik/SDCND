@@ -39,15 +39,14 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   Tools tools;
   VectorXd y = z - tools.ConvertCartesianToPolar(x_);
   y[1] = tools.WrapAnglePi(y[1]);
-  // we need to scale y appropriately so that it's betten -pi and
   UpdateParameters(y);
 }
 
 
 void KalmanFilter::UpdateParameters(const VectorXd &y) {
-  
-  MatrixXd S = H_ * P_ * H_.transpose() + R_;
-  MatrixXd K = P_ * H_.transpose() * S.inverse(); 
+  MatrixXd PHt = P_ * H_.transpose();
+  MatrixXd S = H_ * PHt + R_;
+  MatrixXd K = PHt * S.inverse(); 
   MatrixXd I = MatrixXd::Identity(4,4);
 
   x_ = x_ + (K * y);

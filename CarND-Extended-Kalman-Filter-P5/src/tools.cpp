@@ -54,8 +54,8 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 
 	MatrixXd jacobian = MatrixXd(3, 4);
 	jacobian << 	px / sqsqsum, py / sqsqsum, 0, 0,
-								-py / sqsum, px / sqsum, 0,  0,
-								py * diff1 / sqcube, px * diff2 / sqcube, px / sqsqsum,  py / sqsqsum;
+					-py / sqsum, px / sqsum, 0,  0,
+					py * diff1 / sqcube, px * diff2 / sqcube, px / sqsqsum,  py / sqsqsum;
 	return jacobian;
 }
 
@@ -67,10 +67,10 @@ VectorXd Tools::ConvertCartesianToPolar(const VectorXd& x) {
 	double radius = sqrt(pow(x[0], 2) + pow(x[1], 2));
 	double angle = atan2(x[1], x[0]);
 	double angular_velocity = (x[0]*x[2] + x[1]*x[3])/ radius;
-
+  
 	polar_output << 	radius,
-										angle,
-										angular_velocity;
+						angle,
+						angular_velocity;
 	return polar_output;  
 }
 
